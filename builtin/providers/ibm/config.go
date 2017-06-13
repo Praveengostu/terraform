@@ -12,6 +12,7 @@ import (
 	bluemix "github.com/IBM-Bluemix/bluemix-go"
 	"github.com/IBM-Bluemix/bluemix-go/api/account/accountv2"
 	"github.com/IBM-Bluemix/bluemix-go/api/cf/cfv2"
+	"github.com/IBM-Bluemix/bluemix-go/api/iampap/iampapv1"
 	"github.com/IBM-Bluemix/bluemix-go/api/k8scluster/k8sclusterv1"
 	"github.com/IBM-Bluemix/bluemix-go/bmxerror"
 	"github.com/IBM-Bluemix/bluemix-go/endpoints"
@@ -71,6 +72,7 @@ type ClientSession interface {
 	BluemixSession() (*bxsession.Session, error)
 	CSAPI() (k8sclusterv1.ClusterServiceAPI, error)
 	CFAPI() (cfv2.CfServiceAPI, error)
+	IAMAPI() (iampapv1.IAMPAPAPI, error)
 	BluemixAcccountAPI() (accountv2.AccountServiceAPI, error)
 }
 
@@ -82,6 +84,8 @@ type clientSession struct {
 
 	cfConfigErr  error
 	cfServiceAPI cfv2.CfServiceAPI
+
+	iamServiceAPI iampapv1.IAMPAPAPI
 
 	accountConfigErr     error
 	bmxAccountServiceAPI accountv2.AccountServiceAPI
@@ -100,6 +104,11 @@ func (sess clientSession) CFAPI() (cfv2.CfServiceAPI, error) {
 // BluemixAcccountAPI ...
 func (sess clientSession) BluemixAcccountAPI() (accountv2.AccountServiceAPI, error) {
 	return sess.bmxAccountServiceAPI, sess.accountConfigErr
+}
+
+// IAMAPI provides IAM PAP APIs ...
+func (sess clientSession) IAMAPI() (iampapv1.IAMPAPAPI, error) {
+	return sess.iamServiceAPI, sess.cfConfigErr
 }
 
 // CSAPI provides cluster APIs ...
