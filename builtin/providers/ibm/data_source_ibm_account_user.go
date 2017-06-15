@@ -11,8 +11,8 @@ func dataSourceIBMAccountUser() *schema.Resource {
 		Read: dataSourceIBMAccountUserRead,
 
 		Schema: map[string]*schema.Schema{
-			"org_guid": {
-				Description: "The guid of the org",
+			"account_guid": {
+				Description: "The guid of the account",
 				Type:        schema.TypeString,
 				Required:    true,
 			},
