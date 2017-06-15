@@ -10,6 +10,7 @@ import (
 	slsession "github.com/softlayer/softlayer-go/session"
 
 	bluemix "github.com/IBM-Bluemix/bluemix-go"
+	"github.com/IBM-Bluemix/bluemix-go/api/account/accountv1"
 	"github.com/IBM-Bluemix/bluemix-go/api/account/accountv2"
 	"github.com/IBM-Bluemix/bluemix-go/api/cf/cfv2"
 	"github.com/IBM-Bluemix/bluemix-go/api/iampap/iampapv1"
@@ -74,6 +75,7 @@ type ClientSession interface {
 	CFAPI() (cfv2.CfServiceAPI, error)
 	IAMAPI() (iampapv1.IAMPAPAPI, error)
 	BluemixAcccountAPI() (accountv2.AccountServiceAPI, error)
+	BluemixAcccountv1API() (accountv1.AccountServiceAPI, error)
 }
 
 type clientSession struct {
@@ -87,8 +89,9 @@ type clientSession struct {
 
 	iamServiceAPI iampapv1.IAMPAPAPI
 
-	accountConfigErr     error
-	bmxAccountServiceAPI accountv2.AccountServiceAPI
+	accountConfigErr       error
+	bmxAccountServiceAPI   accountv2.AccountServiceAPI
+	bmxAccountv1ServiceAPI accountv1.AccountServiceAPI
 }
 
 // SoftLayerSession providers SoftLayer Session
@@ -104,6 +107,11 @@ func (sess clientSession) CFAPI() (cfv2.CfServiceAPI, error) {
 // BluemixAcccountAPI ...
 func (sess clientSession) BluemixAcccountAPI() (accountv2.AccountServiceAPI, error) {
 	return sess.bmxAccountServiceAPI, sess.accountConfigErr
+}
+
+// BluemixAcccountAPI ...
+func (sess clientSession) BluemixAcccountv1API() (accountv1.AccountServiceAPI, error) {
+	return sess.bmxAccountv1ServiceAPI, sess.accountConfigErr
 }
 
 // IAMAPI provides IAM PAP APIs ...
