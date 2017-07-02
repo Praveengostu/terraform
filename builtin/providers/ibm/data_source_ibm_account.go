@@ -16,6 +16,34 @@ func dataSourceIBMAccount() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
+			"account_users": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"email": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"state": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"role": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ibm_uniqueid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -34,6 +62,26 @@ func dataSourceIBMAccountRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error retrieving organisation: %s", err)
 	}
+	accountv1Client, err := meta.(ClientSession).BluemixAcccountv1API()
+	if err != nil {
+		return err
+	}
+
+	accountUsers, err := accountv1Client.Accounts().GetAccountUsers(account.GUID)
+	if err != nil {
+		return fmt.Errorf("Error retrieving users in account: %s", err)
+	}
+	accountUsersMap := make([]map[string]interface{}, 0, len(accountUsers))
+	for _, user := range accountUsers {
+		accountUser := make(map[string]interface{})
+		accountUser["email"] = user.Email
+		accountUser["state"] = user.State
+		accountUser["role"] = user.Role
+		accountUser["id"] = user.Id
+		accountUser["ibm_uniqueid"] = user.IbmUniqueId
+		accountUsersMap = append(accountUsersMap, accountUser)
+	}
 	d.SetId(account.GUID)
+	d.Set("account_users", accountUsersMap)
 	return nil
 }
